@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request
 from ..schemas.user import LoginPayload
 from pydantic import ValidationError
 from .. import db
-# from bson import ObjectId
+from bson import ObjectId
 
 main_bp = Blueprint("main_bp", __name__)
 
@@ -20,13 +20,22 @@ def get_products():
     for product in products_db:
         product['_id'] = str(product['_id'])
         products_list.append(product)
-    return jsonify(products_list)    
+    return jsonify(products_list)
 
 
 # RF: O sistema deve permitir que os usuários visualizem detalhes de um produto específico.
-@main_bp.route("/produtos/<int:produto_id>")
+@main_bp.route("/produtos/<string:produto_id>")
 def get_product(produto_id):
-    return jsonify({"message": f"Detalhes do produto {produto_id}"})
+    try:
+        oid = ObjectId(produto_id)
+    except Exception as e:
+        return jsonify({"error": f"Erro ao converter ID: {e}"}), 400
+    product = db.Products.find_one({"_id": oid})
+    if product:
+        product["_id"] = str(product["_id"])
+        return jsonify(product)
+    else:
+        return jsonify({"error": "Produto não encontrado"}), 404
 
 
 # RF: O sistema deve permitir que os usuários criem novo produtos.
@@ -53,9 +62,11 @@ def login():
     try:
         payload = LoginPayload(**request.json)
         print(payload)
-        return jsonify({"message": f"Usuário {payload.username} autenticado com sucesso!"})
+        return jsonify(
+            {"message": f"Usuário {payload.username} autenticado com sucesso!"}
+        )
     except ValidationError as e:
-        return jsonify({"errors": e.errors()}), 400 
+        return jsonify({"errors": e.errors()}), 400
 
 
 # RF: O sistema deve permitir a importação de vendas através de arquivos.
