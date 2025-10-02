@@ -3,6 +3,7 @@ from ..schemas.user import LoginPayload
 from pydantic import ValidationError
 from .. import db
 from bson import ObjectId
+from ..schemas.product import ProductDBModel
 
 main_bp = Blueprint("main_bp", __name__)
 
@@ -16,10 +17,10 @@ def index():
 @main_bp.route("/produtos")
 def get_products():
     products_db = db.Products.find()
-    products_list = []
-    for product in products_db:
-        product['_id'] = str(product['_id'])
-        products_list.append(product)
+    products_list = [
+        ProductDBModel(**product).model_dump(by_alias=True, exclude_none=True)
+        for product in products_db
+    ]
     return jsonify(products_list)
 
 
@@ -32,7 +33,7 @@ def get_product(produto_id):
         return jsonify({"error": f"Erro ao converter ID: {e}"}), 400
     product = db.Products.find_one({"_id": oid})
     if product:
-        product["_id"] = str(product["_id"])
+        product = ProductDBModel(**product).model_dump(by_alias=True, exclude_none=True)
         return jsonify(product)
     else:
         return jsonify({"error": "Produto não encontrado"}), 404
