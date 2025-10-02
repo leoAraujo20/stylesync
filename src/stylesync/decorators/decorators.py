@@ -10,15 +10,15 @@ def token_required(func):
         if "Authorization" in request.headers:
             token = request.headers["Authorization"].split(" ")[1]
         if not token:
-            return jsonify({"message": "Token is missing!"}), 401
+            return jsonify({"message": "Token não fornecido!"}), 401
         try:
-            data = jwt.decode(
+            token_data = jwt.decode(
                 token, current_app.config["SECRET_KEY"], algorithms=["HS256"]
             )
         except jwt.ExpiredSignatureError:
-            return jsonify({"message": "Token has expired!"}), 401
+            return jsonify({"message": "Token expirado!"}), 401
         except jwt.InvalidTokenError:
-            return jsonify({"message": "Invalid token!"}), 401
-        return func(data, *args, **kwargs)
+            return jsonify({"message": "Token inválido!"}), 401
+        return func(token_data, *args, **kwargs)
 
     return wrapper

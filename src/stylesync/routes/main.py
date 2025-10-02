@@ -1,9 +1,12 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, current_app
 from ..schemas.user import LoginPayload
 from pydantic import ValidationError
 from .. import db
 from bson import ObjectId
-from ..schemas.product import ProductDBModel
+from ..schemas.product import ProductDBModel, Product
+import jwt
+from datetime import datetime, timedelta, timezone
+from ..decorators.decorators import token_required
 
 main_bp = Blueprint("main_bp", __name__)
 
@@ -41,8 +44,17 @@ def get_product(produto_id):
 
 # RF: O sistema deve permitir que os usuários criem novo produtos.
 @main_bp.route("/produtos", methods=["POST"])
-def create_product():
-    return jsonify({"message": "Essa é a rota pra criação de um produto!"})
+@token_required
+def create_product(token_data):
+    try:
+        product_data = Product(**request.json)
+    except ValidationError as e:
+        return jsonify({"errors": e.errors()}), 400
+
+    result = db.Products.insert_one(product_data.model_dump(exclude_none=True))
+    return jsonify(
+        {"message": "Produto criado com sucesso!", "id": str(result.inserted_id)}
+    ), 201
 
 
 # RF: O sistema deve permitir que os usuários atualizem produtos existentes.
@@ -62,12 +74,21 @@ def remove_product(produto_id):
 def login():
     try:
         payload = LoginPayload(**request.json)
-        print(payload)
-        return jsonify(
-            {"message": f"Usuário {payload.username} autenticado com sucesso!"}
-        )
     except ValidationError as e:
         return jsonify({"errors": e.errors()}), 400
+
+    if payload.username == "admin" and payload.password == "password":
+        token = jwt.encode(
+            {
+                "user": payload.username,
+                "exp": datetime.now(timezone.utc) + timedelta(minutes=30),
+            },
+            current_app.config["SECRET_KEY"],
+            algorithm="HS256",
+        )
+        return jsonify({"access_token": token})
+
+    return jsonify({"message": "Credenciais inválidas"}), 401
 
 
 # RF: O sistema deve permitir a importação de vendas através de arquivos.
