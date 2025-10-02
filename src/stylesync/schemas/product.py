@@ -47,3 +47,12 @@ class ProductDBModel(Product):
         if "_id" in data and isinstance(data["_id"], ObjectId):
             data["_id"] = str(data["_id"])
         return data
+
+
+class ProductUpdateModel(BaseModel):
+    name: Optional[str] = None
+    price: Optional[float] = None
+    description: Optional[str] = None
+    stock: Optional[int] = None
+
+    model_config = ConfigDict(arbitrary_types_allowed=True)

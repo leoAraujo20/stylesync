@@ -3,7 +3,7 @@ from ..schemas.user import LoginPayload
 from pydantic import ValidationError
 from .. import db
 from bson import ObjectId
-from ..schemas.product import ProductDBModel, Product
+from ..schemas.product import ProductDBModel, Product, ProductUpdateModel
 import jwt
 from datetime import datetime, timedelta, timezone
 from ..decorators.decorators import token_required
@@ -58,9 +58,22 @@ def create_product(token_data):
 
 
 # RF: O sistema deve permitir que os usuários atualizem produtos existentes.
-@main_bp.route("/produtos/<int:produto_id>", methods=["PUT"])
-def update_product(produto_id):
-    return jsonify({"message": f"Produto {produto_id} atualizado com sucesso!"})
+@main_bp.route("/produtos/<string:produto_id>", methods=["PUT"])
+@token_required
+def update_product(token_data, produto_id):
+    try:
+        product_data = ProductUpdateModel(**request.json)
+    except ValidationError as e:
+        return jsonify({"errors": e.errors()}), 400
+
+    result = db.Products.update_one(
+        {"_id": ObjectId(produto_id)},
+        {"$set": product_data.model_dump(exclude_none=True)}
+    )
+    if result.modified_count:
+        return jsonify({"message": f"Produto {produto_id} atualizado com sucesso!"})
+    else:
+        return jsonify({"error": "Produto não encontrado"}), 404
 
 
 # RF: O sistema deve permitir que os usuários excluam produtos.
