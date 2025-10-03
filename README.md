@@ -27,7 +27,7 @@ Para executar este projeto localmente, certifique-se de ter o **Git** e o **Dock
 
 **1. Clonar o Repositório**
 ```bash
-git clone <URL_DO_SEU_REPOSITORIO>
+git clone https://github.com/leoAraujo20/stylesync.git
 cd stylesync
 ```
 
@@ -55,4 +55,5 @@ docker compose up --build -d
 
 **4. Aceder à Aplicação**
 A API estará disponível no endereço `http://localhost:5000`.
+
 
