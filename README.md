@@ -42,6 +42,7 @@ SECRET_KEY="uma-chave-secreta-forte-e-aleatoria"
 # Credenciais para o banco de dados MongoDB
 MONGO_USERNAME=stylesync_user
 MONGO_PASSWORD=stylesync_pwd
+MONGO_URI="mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@localhost:27017/?authSource=admin"
 ```
 
 **3. Construir e Iniciar os Containers**
@@ -55,5 +56,6 @@ docker compose up --build -d
 
 **4. Aceder à Aplicação**
 A API estará disponível no endereço `http://localhost:5000`.
+
 
 
