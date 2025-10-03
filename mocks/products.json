@@ -1,0 +1,50 @@
+[
+  {
+    "name": "Placa de video rtx",
+    "price": 1599.5,
+    "description": "Uma placa de video potente",
+    "stock": 50
+  },
+  {
+    "name": "Nootebook Acer Nitro",
+    "price": 9500.5,
+    "description": "Um nootebook muito potente",
+    "stock": 10
+  },
+  {
+    "name": "Camiseta Algodão Pima",
+    "price": 129.9,
+    "description": "Camiseta básica de alta qualidade, feita com o melhor algodão peruano. Toque macio e caimento perfeito.",
+    "stock": 150
+  },
+  {
+    "name": "Calça Jeans Reta Estonada",
+    "price": 299.99,
+    "description": "Calça jeans com lavagem estonada, corte reto e tecido confortável com elastano.",
+    "stock": 85
+  },
+  {
+    "name": "Tênis Branco Casual de Couro",
+    "price": 450,
+    "description": "Tênis versátil para o dia a dia, feito em couro legítimo com solado de borracha.",
+    "stock": 120
+  },
+  {
+    "name": "Moletom com Capuz 'Urban Style'",
+    "price": 289.9,
+    "description": "Um moleton confortável com capuz, ideal para looks casuais e despojados.",
+    "stock": 70
+  },
+  {
+    "name": "Jaqueta Jeans Clássica",
+    "price": 359.5,
+    "description": "Jaqueta jeans atemporal, perfeita para compor qualquer look.",
+    "stock": 50
+  },
+  {
+    "name": "Bermuda Chino de Sarja",
+    "price": 179,
+    "description": "Bermuda de sarja com corte chino, elegante e confortável.",
+    "stock": 90
+  }
+]
