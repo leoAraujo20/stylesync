@@ -1,6 +1,6 @@
 # Stylesync
 
-é uma aplicação desenvolvida em Flask para a gestão de um sistema de inventário de produtos, utilizadores e vendas. Criado como um projeto de estudos, o foco foi a aplicação de práticas modernas de desenvolvimento back-end, validação de dados e um ambiente totalmente containerizado.
+é uma aplicação desenvolvida em Flask para a gestão de um sistema de inventário de produtos, usuários e vendas. Criado como um projeto de estudos, o foco foi a aplicação de práticas modernas de desenvolvimento back-end, validação de dados e um ambiente totalmente containerizado.
 
 ## ✨ Funcionalidades
 
@@ -55,3 +55,4 @@ docker compose up --build -d
 
 **4. Aceder à Aplicação**
 A API estará disponível no endereço `http://localhost:5000`.
+
