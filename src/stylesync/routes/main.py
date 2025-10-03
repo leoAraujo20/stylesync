@@ -3,10 +3,13 @@ from ..schemas.user import LoginPayload
 from pydantic import ValidationError
 from .. import db
 from bson import ObjectId
+from ..schemas.sale import Sale
 from ..schemas.product import ProductDBModel, Product, ProductUpdateModel
 import jwt
 from datetime import datetime, timedelta, timezone
 from ..decorators.decorators import token_required
+import csv
+import io
 
 main_bp = Blueprint("main_bp", __name__)
 
@@ -68,7 +71,7 @@ def update_product(token_data, produto_id):
 
     result = db.Products.update_one(
         {"_id": ObjectId(produto_id)},
-        {"$set": product_data.model_dump(exclude_none=True)}
+        {"$set": product_data.model_dump(exclude_none=True)},
     )
     if result.modified_count:
         return jsonify({"message": f"Produto {produto_id} atualizado com sucesso!"})
@@ -106,5 +109,34 @@ def login():
 
 # RF: O sistema deve permitir a importação de vendas através de arquivos.
 @main_bp.route("/importar_vendas", methods=["POST"])
-def import_sales():
-    return jsonify({"message": "Essa é a rota de importação de vendas"})
+@token_required
+def import_sales(token_data):
+    if "file" not in request.files:
+        return jsonify({"error": "Nenhum arquivo enviado"}), 400
+
+    file = request.files["file"]
+    if file.filename == "":
+        return jsonify({"error": "Nenhum arquivo selecionado"}), 400
+
+    if file.filename.endswith(".csv"):
+        try:
+            stream = io.StringIO(file.stream.read().decode("UTF8"), newline=None)
+            csv_reader = csv.DictReader(stream)
+            sales = []
+            errors = []
+            for row_num, row in enumerate(csv_reader, start=1):
+                try:
+                    sale = Sale(**row).model_dump()
+                    sales.append(sale)
+                except Exception as e:
+                    errors.append(f"Erro na linha {row_num}: {e}")
+
+            if errors:
+                return jsonify({"errors": errors}), 400
+
+            db.Sales.insert_many(sales)
+            return jsonify({"message": "Vendas importadas com sucesso!"}), 200
+        except Exception as e:
+            return jsonify({"error": f"Erro ao processar o arquivo CSV: {e}"}), 500
+    else:
+        return jsonify({"error": "Formato de arquivo não suportado"}), 400
